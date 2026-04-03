@@ -1,0 +1,48 @@
+.home__hero {
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.home__subtitle {
+  max-width: 680px;
+}
+
+.home__cta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  align-items: center;
+}
+
+.home__badge {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.home__buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.home__grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 860px) {
+  .home__grid {
+    grid-template-columns: 1fr;
+  }
+  .home__buttons {
+    width: 100%;
+  }
+}
+

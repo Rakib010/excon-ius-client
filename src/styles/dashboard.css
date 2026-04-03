@@ -1,0 +1,102 @@
+.dashboard {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+/* University of Scholars brand — https://ius.edu.bd/ (.top-header-area, .highlited_menu) */
+.dashboard__sidebar {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #5c0931;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0;
+  padding: 18px 14px;
+}
+
+.dashboard__title {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+  font-size: 1.25rem;
+  margin-bottom: 22px;
+}
+
+.dashboard__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard__link {
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+}
+
+.dashboard__link:hover {
+  color: #fab86d;
+}
+
+.dashboard__link.active {
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(250, 184, 109, 0.45);
+  color: #fab86d;
+}
+
+.dashboard__content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #fff;
+  color: #111827;
+  padding: 24px 20px;
+}
+
+.dashboard__content h1,
+.dashboard__content h2 {
+  color: #111827;
+}
+
+.dashboard__content p,
+.dashboard__content ul {
+  color: #4b5563;
+}
+
+.dashboard__content .card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  backdrop-filter: none;
+}
+
+.dashboard__content .card p,
+.dashboard__content .card ul {
+  color: #4b5563;
+}
+
+@media (max-width: 920px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .dashboard__sidebar {
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .dashboard__content {
+    min-height: auto;
+  }
+}
+

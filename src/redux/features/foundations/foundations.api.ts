@@ -1,0 +1,91 @@
+import { baseApi } from "@/redux/baseApi";
+
+export type FoundationEntity = Record<string, unknown> & { id?: number };
+
+export const foundationsApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getDepartments: builder.query<FoundationEntity[], void>({
+      query: () => ({ url: "/foundations/departments", method: "GET" }),
+      providesTags: ["FOUNDATIONS"],
+    }),
+    createDepartment: builder.mutation<FoundationEntity, { name: string; code: string }>({
+      query: (data) => ({ url: "/foundations/departments", method: "POST", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    updateDepartment: builder.mutation<FoundationEntity, { id: number | string; data: Record<string, unknown> }>({
+      query: ({ id, data }) => ({ url: `/foundations/departments/${id}`, method: "PUT", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    deleteDepartment: builder.mutation<{ message: string }, number | string>({
+      query: (id) => ({ url: `/foundations/departments/${id}`, method: "DELETE" }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    getBatches: builder.query<FoundationEntity[], void>({
+      query: () => ({ url: "/foundations/batches", method: "GET" }),
+      providesTags: ["FOUNDATIONS"],
+    }),
+    createBatch: builder.mutation<FoundationEntity, Record<string, unknown>>({
+      query: (data) => ({ url: "/foundations/batches", method: "POST", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    updateBatch: builder.mutation<FoundationEntity, { id: number | string; data: Record<string, unknown> }>({
+      query: ({ id, data }) => ({ url: `/foundations/batches/${id}`, method: "PUT", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    deleteBatch: builder.mutation<{ message: string }, number | string>({
+      query: (id) => ({ url: `/foundations/batches/${id}`, method: "DELETE" }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    getSections: builder.query<FoundationEntity[], void>({
+      query: () => ({ url: "/foundations/sections", method: "GET" }),
+      providesTags: ["FOUNDATIONS"],
+    }),
+    createSection: builder.mutation<FoundationEntity, Record<string, unknown>>({
+      query: (data) => ({ url: "/foundations/sections", method: "POST", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    updateSection: builder.mutation<FoundationEntity, { id: number | string; data: Record<string, unknown> }>({
+      query: ({ id, data }) => ({ url: `/foundations/sections/${id}`, method: "PUT", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    deleteSection: builder.mutation<{ message: string }, number | string>({
+      query: (id) => ({ url: `/foundations/sections/${id}`, method: "DELETE" }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    getCourses: builder.query<FoundationEntity[], void>({
+      query: () => ({ url: "/foundations/courses", method: "GET" }),
+      providesTags: ["FOUNDATIONS"],
+    }),
+    createCourse: builder.mutation<FoundationEntity, Record<string, unknown>>({
+      query: (data) => ({ url: "/foundations/courses", method: "POST", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    updateCourse: builder.mutation<FoundationEntity, { id: number | string; data: Record<string, unknown> }>({
+      query: ({ id, data }) => ({ url: `/foundations/courses/${id}`, method: "PUT", data }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+    deleteCourse: builder.mutation<{ message: string }, number | string>({
+      query: (id) => ({ url: `/foundations/courses/${id}`, method: "DELETE" }),
+      invalidatesTags: ["FOUNDATIONS"],
+    }),
+  }),
+});
+
+export const {
+  useGetDepartmentsQuery,
+  useCreateDepartmentMutation,
+  useUpdateDepartmentMutation,
+  useDeleteDepartmentMutation,
+  useGetBatchesQuery,
+  useCreateBatchMutation,
+  useUpdateBatchMutation,
+  useDeleteBatchMutation,
+  useGetSectionsQuery,
+  useCreateSectionMutation,
+  useUpdateSectionMutation,
+  useDeleteSectionMutation,
+  useGetCoursesQuery,
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+  useDeleteCourseMutation,
+} = foundationsApi;
