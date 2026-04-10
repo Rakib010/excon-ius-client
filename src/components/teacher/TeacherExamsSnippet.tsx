@@ -2,7 +2,6 @@ import "@/styles/teacher.css";
 import { useGetExamsQuery } from "@/redux/features/exam-room/examRoom.api";
 import { useSkipTeacherApi } from "@/hooks/useTeacherProfile";
 
-/** GET /exam-room/exams — all authenticated users; sorted by server (exam_date ASC). */
 export function TeacherExamsSnippet() {
   const skipApi = useSkipTeacherApi();
   const { data: exams = [], isLoading, error } = useGetExamsQuery(undefined, { skip: skipApi });
@@ -15,9 +14,7 @@ export function TeacherExamsSnippet() {
   return (
     <div className="card">
       <h2>Upcoming exams (schedule)</h2>
-      <p className="teacher-page__lead">
-        <code>GET /exam-room/exams</code> — reference for dates/times; duty assignment appears under My allocation.
-      </p>
+      <p className="teacher-page__lead">Reference schedule for upcoming exams. Your assigned duties appear under My allocation.</p>
       {skipApi ? (
         <p className="teacher-muted">Sign in to load the exam schedule.</p>
       ) : isLoading ? (

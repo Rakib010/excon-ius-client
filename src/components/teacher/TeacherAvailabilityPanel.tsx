@@ -19,7 +19,7 @@ export function TeacherAvailabilityPanel() {
       <div className="card">
         <h2>Availability for invigilation</h2>
         <p className="teacher-muted">
-          Sign in with a teacher account (or turn off dev mock auth) to load and update availability via the API.
+          Sign in to view and update your availability.
         </p>
       </div>
     );
@@ -28,10 +28,7 @@ export function TeacherAvailabilityPanel() {
   return (
     <div className="card">
       <h2>Availability for invigilation</h2>
-      <p className="teacher-page__lead">
-        Server: <code>POST /leaves/availability/update</code> with <code>{"{ is_available: boolean }"}</code> — updates{" "}
-        <code>users.is_available</code>.
-      </p>
+      <p className="teacher-page__lead">Set whether you are available for invigilation scheduling.</p>
 
       {isLoading ? (
         <p className="teacher-muted">Loading…</p>
@@ -63,7 +60,7 @@ export function TeacherAvailabilityPanel() {
 
           {error != null && (
             <p className="teacher-error" style={{ marginTop: 12 }}>
-              Could not update availability.
+              Could not update availability. Please try again.
             </p>
           )}
         </>

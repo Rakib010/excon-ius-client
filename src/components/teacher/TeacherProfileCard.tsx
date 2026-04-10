@@ -34,7 +34,7 @@ export function TeacherProfileCard({
   return (
     <div className="card">
       <h2>Your profile</h2>
-      <p className="teacher-page__lead">From GET <code>/auth/profile</code> — staff & contact fields.</p>
+      <p className="teacher-page__lead">Your staff and contact details.</p>
       <div className="teacher-profile">
         <div className="teacher-profile__field">
           <span className="teacher-profile__label">Name</span>

@@ -3,64 +3,80 @@ import { useNavigate, Link } from "react-router-dom";
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hooks";
 import { authActions } from "@/redux/features/auth/auth.slice";
-import { role as roles } from "@/constants/role";
+import { normalizeRoleForRoute, role as roles } from "@/constants/role";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { AuthSplitLayout } from "@/layouts/AuthSplitLayout";
 import { IconLock, IconMail, IconUser, IconEye, IconEyeOff } from "@/components/auth/AuthIcons";
 import "@/styles/auth.css";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export function Register() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [registerMutation] = useRegisterMutation();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [designation, setDesignation] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<{
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    employeeId?: string;
+    designation?: string;
+  }>({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: roles.teacher,
+      employeeId: "",
+      designation: "",
+    },
+  });
+
+  const onSubmit = handleSubmit(
+    async (values: {
+      name: string;
+      email: string;
+      password: string;
+      role: string;
+      employeeId?: string;
+      designation?: string;
+    }) => {
     try {
       const res = await registerMutation({
-        name,
-        email,
-        password,
-        employee_id: employeeId || undefined,
-        designation: designation || undefined,
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+        employee_id: values.employeeId?.trim() ? values.employeeId.trim() : undefined,
+        designation: values.designation?.trim() ? values.designation.trim() : undefined,
       }).unwrap();
+      
       dispatch(authActions.setAccessToken(res.accessToken));
       dispatch(authActions.setUser(res.user));
-      if (res.user.role === roles.teacher) navigate("/teacher", { replace: true });
+      toast.success("Account created successfully.");
+      if (normalizeRoleForRoute(res.user.role) === roles.teacher) navigate("/teacher", { replace: true });
+      else if (normalizeRoleForRoute(res.user.role) === roles.superAdmin) navigate("/super-admin", { replace: true });
       else navigate("/admin", { replace: true });
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Registration failed"));
-    } finally {
-      setIsSubmitting(false);
+      const msg = getErrorMessage(err, "Registration failed");
+      setError("root", { message: msg });
+      toast.error(msg);
     }
-  };
+    },
+  );
 
   return (
-    <AuthSplitLayout
-      wideForm
-      panelTitle="Join your colleagues on EXCON-IUS."
-      panelLead="Create an account to manage availability, leaves, and invigilation assignments."
-      quote="Clear allocation workflows help us respect faculty time and exam integrity—on campus and online."
-      quoteAuthor="Exam coordination"
-      quoteRole="University of Scholars"
-    >
+    <AuthSplitLayout wideForm panelTitle="">
       <form onSubmit={onSubmit} noValidate>
-        <div className="auth-split__brand">
-          <span className="auth-split__brand-mark">EXCON-IUS</span>
-          <span className="auth-split__brand-tag">Invigilation Management</span>
-        </div>
-
         <h1 className="auth-split__heading">Create your account</h1>
         <p className="auth-split__sub">Default role is TEACHER unless specified by your administrator.</p>
 
@@ -71,7 +87,12 @@ export function Register() {
               <span className="field-input__icon">
                 <IconUser />
               </span>
-              <input value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" placeholder="Your full name" />
+              <input
+                required
+                autoComplete="name"
+                placeholder="Your full name"
+                {...register("name", { required: "Name is required." })}
+              />
             </div>
           </label>
           <label className="field">
@@ -81,12 +102,11 @@ export function Register() {
                 <IconMail />
               </span>
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 required
                 autoComplete="email"
                 placeholder="name@university.edu.bd"
+                {...register("email", { required: "Email is required." })}
               />
             </div>
           </label>
@@ -99,12 +119,11 @@ export function Register() {
               <IconLock />
             </span>
             <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               type={showPassword ? "text" : "password"}
               required
               autoComplete="new-password"
               placeholder="Choose a strong password"
+              {...register("password", { required: "Password is required." })}
             />
             <button
               type="button"
@@ -117,22 +136,33 @@ export function Register() {
           </div>
         </label>
 
+        <label className="field">
+          <span>Role</span>
+          <div className="field-input">
+            <select required {...register("role", { required: true })}>
+              <option value={roles.teacher}>TEACHER</option>
+              <option value={roles.admin}>ADMIN</option>
+              <option value={roles.superAdmin}>SUPER_ADMIN</option>
+            </select>
+          </div>
+        </label>
+
         <div className="grid2">
           <label className="field">
             <span>Employee ID (optional)</span>
             <div className="field-input">
-              <input value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} placeholder="Staff ID" />
+              <input placeholder="Staff ID" {...register("employeeId")} />
             </div>
           </label>
           <label className="field">
             <span>Designation (optional)</span>
             <div className="field-input">
-              <input value={designation} onChange={(e) => setDesignation(e.target.value)} placeholder="e.g. Lecturer" />
+              <input placeholder="e.g. Lecturer" {...register("designation")} />
             </div>
           </label>
         </div>
 
-        {error && <div className="auth__error">{error}</div>}
+        {errors.root?.message ? <div className="auth__error">{errors.root.message}</div> : null}
 
         <button className="btn auth__submit" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Creating…" : "Create account"}

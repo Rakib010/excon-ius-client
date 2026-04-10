@@ -22,14 +22,11 @@ export function TeacherDutiesPanel({ teacherId }: { teacherId: string | null }) 
   return (
     <div className="card">
       <h2>My published invigilation duties</h2>
-      <p className="teacher-page__lead">
-        <code>GET /allocations/published</code> returns all published rows; we show rows where <code>teacher_id</code> matches your
-        profile <code>id</code>. Each row includes <code>course_name</code>, <code>exam_date</code>, <code>room_name</code> from
-        server joins.
-      </p>
+      <p className="teacher-page__lead">Published duties assigned to you.</p>
 
       {!teacherId ? (
-        <p className="teacher-muted">Sign in to see your duties.</p>
+        <p className="teacher-muted">{skipApi ? "Sign in to see your duties." : "Loading your profile…"}
+        </p>
       ) : isLoading ? (
         <p className="teacher-muted">Loading…</p>
       ) : error ? (

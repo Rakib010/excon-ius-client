@@ -31,6 +31,34 @@
   gap: 8px;
 }
 
+.dashboard__sidebar-footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dashboard__logout {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.dashboard__logout:hover {
+  color: #fab86d;
+  border-color: rgba(250, 184, 109, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard__logout:active {
+  transform: translateY(1px);
+}
+
 .dashboard__link {
   padding: 10px 10px;
   border-radius: 12px;

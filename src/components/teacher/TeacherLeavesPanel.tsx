@@ -64,9 +64,7 @@ export function TeacherLeavesPanel() {
       <div className="teacher-leaves-split">
         <div className="teacher-leaves-split__list card">
           <h2 style={{ marginTop: 0 }}>My leave requests</h2>
-          <p className="teacher-page__lead">
-            <code>GET /leaves/history</code> — dates, reason, status. Cancel pending: <code>DELETE /leaves/cancel/:id</code>.
-          </p>
+          <p className="teacher-page__lead">View and manage your leave requests.</p>
 
           {skipApi ? (
             <p className="teacher-muted">Sign in to load your leave history.</p>
@@ -103,7 +101,9 @@ export function TeacherLeavesPanel() {
                             type="button"
                             className="teacher-btn-danger"
                             disabled={cancelling}
-                            onClick={() => void onCancel(row.id)}
+                            onClick={() => {
+                              if (window.confirm("Cancel this leave request?")) void onCancel(row.id);
+                            }}
                           >
                             Cancel
                           </button>
@@ -138,7 +138,7 @@ export function TeacherLeavesPanel() {
             <div className="teacher-leaves-form-panel">
               <h3>New leave request</h3>
               <p className="teacher-muted" style={{ marginBottom: 12 }}>
-                <code>POST /leaves/apply</code> — <code>start_date</code>, <code>end_date</code>, optional <code>reason</code>.
+                Pick the leave dates and add an optional reason.
               </p>
               <form className="teacher-form" style={{ maxWidth: "100%" }} onSubmit={onSubmit}>
                 <div className="teacher-form__row">

@@ -1,6 +1,3 @@
-/**
- * Dev: লগইন ছাড়া role-based — `.env` এ `VITE_DEV_MOCK_AUTH=true` ও `VITE_DEV_MOCK_ROLE=ADMIN|SUPER_ADMIN|TEACHER`
- */
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { Login } from "@/pages/auth/Login";
 import { Register } from "@/pages/auth/Register";
@@ -9,6 +6,7 @@ import { withAuth } from "@/utils/withAuth";
 import { role } from "@/constants/role";
 import { RootRedirect } from "@/pages/RootRedirect";
 import { AdminShell } from "@/pages/admin/AdminShell";
+import { SuperAdminShell } from "@/pages/super-admin/SuperAdminShell";
 import { TeacherShell } from "@/pages/teacher/TeacherShell";
 import { AdminOverview } from "@/pages/admin/AdminOverview";
 import { Foundations } from "@/pages/admin/Foundations";
@@ -32,7 +30,7 @@ export const router = createBrowserRouter([
   // Admin dashboard
   {
     path: "/admin",
-    Component: withAuth(AdminShell, [role.admin, role.superAdmin]),
+    Component: withAuth(AdminShell, role.admin),
     children: [
       { index: true, Component: AdminOverview },
       { path: "foundations", Component: Foundations },
@@ -44,13 +42,26 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // SUPER_ADMIN ও ADMIN একই ড্যাশবোর্ড — পুরনো/বুকমার্ক URL
-  { path: "/super-admin", element: <Navigate to="/admin" replace /> },
+  // Super admin dashboard (separate route)
+  {
+    path: "/super-admin",
+    Component: withAuth(SuperAdminShell, role.superAdmin),
+    children: [
+      { index: true, Component: AdminOverview },
+      { path: "foundations", Component: Foundations },
+      { path: "exams-rooms", Component: ExamsRooms },
+      { path: "allocations", Component: Allocations },
+      { path: "leaves", Component: LeaveRequests },
+      { path: "logs", Component: Logs },
+      { path: "*", element: <Navigate to="/super-admin" replace /> },
+    ],
+  },
 
   // Teacher dashboard
   {
     path: "/teacher",
-    Component: withAuth(TeacherShell, role.teacher),
+    // SUPER_ADMIN can access everything (teacher + admin)
+    Component: withAuth(TeacherShell, [role.teacher, role.superAdmin]),
     children: [
       { index: true, Component: TeacherOverview },
       { path: "availability", Component: Availability },

@@ -12,8 +12,16 @@ export function TeacherOverview() {
   const skipApi = useSkipTeacherApi();
   const { profile, isLoading, teacherId } = useTeacherProfile();
 
-  const { data: published = [] } = useGetPublishedAllocationsQuery(undefined, { skip: skipApi });
-  const { data: leaveHistory = [] } = useGetLeaveHistoryQuery(undefined, { skip: skipApi });
+  const {
+    data: published = [],
+    isLoading: isLoadingAllocations,
+    error: allocationsError,
+  } = useGetPublishedAllocationsQuery(undefined, { skip: skipApi });
+  const {
+    data: leaveHistory = [],
+    isLoading: isLoadingLeaves,
+    error: leavesError,
+  } = useGetLeaveHistoryQuery(undefined, { skip: skipApi });
 
   const myDuties = (published as PublishedAllocationRow[]).filter((a) => teacherId && a.teacher_id === teacherId);
   const leaves = leaveHistory as TeacherLeaveRow[];
@@ -22,12 +30,20 @@ export function TeacherOverview() {
     <div className="teacher-page">
       <div className="card">
         <h1>Teacher overview</h1>
-        <p className="teacher-page__lead">
-          Data comes from the server APIs your role can call: profile, published allocations, leave history, and exam list.
-        </p>
+        <p className="teacher-page__lead">Quick snapshot of your profile, leave requests, duties, and upcoming exams.</p>
+        {(Boolean(allocationsError) || Boolean(leavesError)) && (
+          <p className="teacher-error" style={{ marginTop: 12 }}>
+            Some data could not be loaded. Please refresh and try again.
+          </p>
+        )}
       </div>
 
-      <TeacherOverviewStats myDuties={myDuties} leaves={leaves} isAvailable={profile?.is_available} />
+      <TeacherOverviewStats
+        myDuties={myDuties}
+        leaves={leaves}
+        isAvailable={profile?.is_available}
+        isLoading={isLoading || isLoadingAllocations || isLoadingLeaves}
+      />
 
       <TeacherProfileCard profile={profile} isLoading={isLoading} />
 

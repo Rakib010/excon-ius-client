@@ -1,13 +1,12 @@
 import { useProfileQuery } from "@/redux/features/auth/auth.api";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppSelector } from "@/redux/hooks";
-import { DEV_MOCK_AUTH_ENABLED } from "@/constants/devAuth";
 import type { TeacherProfile } from "@/types/teacher";
 
-/** Skip RTK calls when no JWT (avoids 401) or dev mock (no backend session). */
+/** Skip RTK calls when no JWT (avoids 401). */
 export function useSkipTeacherApi() {
   const accessToken = useAppSelector((s) => s.auth.accessToken);
-  return DEV_MOCK_AUTH_ENABLED || !accessToken;
+  return !accessToken;
 }
 
 /**
@@ -18,11 +17,11 @@ export function useTeacherProfile() {
   const accessToken = useAppSelector((s) => s.auth.accessToken);
 
   const { data, isLoading, error, refetch } = useProfileQuery(undefined, {
-    skip: DEV_MOCK_AUTH_ENABLED || !accessToken,
+    skip: !accessToken,
   });
 
   const profile = (data ?? ctxUser) as TeacherProfile | null;
-  const isLoadingProfile = DEV_MOCK_AUTH_ENABLED ? false : isLoading;
+  const isLoadingProfile = isLoading;
 
   return {
     profile,

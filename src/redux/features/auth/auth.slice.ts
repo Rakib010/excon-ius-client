@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
+import { getAccessToken } from "@/lib/authToken";
 export type AuthUser = {
   id: string;
   name: string;
@@ -13,7 +13,7 @@ type AuthState = {
 };
 
 const initialState: AuthState = {
-  accessToken: null,
+  accessToken: getAccessToken(),
   user: null,
 };
 

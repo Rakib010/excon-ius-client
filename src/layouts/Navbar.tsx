@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { normalizeRoleForRoute, role } from "@/constants/role";
 import "@/styles/navbar.css";
 
 export function Navbar() {
@@ -28,9 +29,15 @@ export function Navbar() {
               <NavLink to="/teacher" className={({ isActive }) => (isActive ? "nav__link active" : "nav__link")}>
                 Teacher
               </NavLink>
-              <NavLink to="/admin" className={({ isActive }) => (isActive ? "nav__link active" : "nav__link")}>
-                Admin
-              </NavLink>
+              {normalizeRoleForRoute(user?.role) === role.superAdmin ? (
+                <NavLink to="/super-admin" className={({ isActive }) => (isActive ? "nav__link active" : "nav__link")}>
+                  Super Admin
+                </NavLink>
+              ) : (
+                <NavLink to="/admin" className={({ isActive }) => (isActive ? "nav__link active" : "nav__link")}>
+                  Admin
+                </NavLink>
+              )}
             </>
           )}
         </nav>
