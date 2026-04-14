@@ -1,17 +1,21 @@
 import { baseApi } from "@/redux/baseApi";
-
-/** Public user shape from API (no password). */
-export type UserRecord = Record<string, unknown> & {
-  id: string;
-  name?: string;
-  email?: string;
-  role?: string;
-};
+import type { UserRecord } from "@/types/users";
 
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllUsers: builder.query<UserRecord[], void>({
-      query: () => ({ url: "/users/all", method: "GET" }),
+    getAllUsers: builder.query<
+      UserRecord[],
+      | void
+      | Partial<{
+          search: string;
+          role: "SUPER_ADMIN" | "ADMIN" | "TEACHER" | string;
+          is_active: boolean;
+          is_available: boolean;
+          page: number;
+          limit: number;
+        }>
+    >({
+      query: (params) => ({ url: "/users/all", method: "GET", params: params ?? undefined }),
       providesTags: ["USERS"],
     }),
     getTeachers: builder.query<UserRecord[], void>({

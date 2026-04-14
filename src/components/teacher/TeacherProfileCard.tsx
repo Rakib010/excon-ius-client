@@ -15,26 +15,43 @@ export function TeacherProfileCard({
 }) {
   if (isLoading) {
     return (
-      <div className="card">
-        <h2>Profile</h2>
-        <p className="teacher-muted">Loading profile…</p>
+      <div className="foundations">
+        <div className="card foundations__card">
+          <div className="foundations__page-head">
+            <div>
+              <h2>Profile</h2>
+              <p className="foundations__muted">Loading profile…</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!profile?.id) {
     return (
-      <div className="card">
-        <h2>Profile</h2>
-        <p className="teacher-muted">Sign in to load your profile from the server.</p>
+      <div className="foundations">
+        <div className="card foundations__card">
+          <div className="foundations__page-head">
+            <div>
+              <h2>Profile</h2>
+              <p className="foundations__muted">Sign in to load your profile from the server.</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h2>Your profile</h2>
-      <p className="teacher-page__lead">Your staff and contact details.</p>
+    <div className="foundations">
+      <div className="card foundations__card">
+        <div className="foundations__page-head">
+          <div>
+            <h2>Your profile</h2>
+            <p className="foundations__lead">Your staff and contact details.</p>
+          </div>
+        </div>
       <div className="teacher-profile">
         <div className="teacher-profile__field">
           <span className="teacher-profile__label">Name</span>
@@ -74,6 +91,7 @@ export function TeacherProfileCard({
           <span className="teacher-profile__label">Permanent address</span>
           <span className="teacher-profile__value">{fmt(profile.permanent_address)}</span>
         </div>
+      </div>
       </div>
     </div>
   );

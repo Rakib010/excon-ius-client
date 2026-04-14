@@ -2,10 +2,18 @@ import { baseApi } from "@/redux/baseApi";
 
 export type FoundationEntity = Record<string, unknown> & { id?: number };
 
+function normalizeListResponse(res: unknown): FoundationEntity[] {
+  if (Array.isArray(res)) return res as FoundationEntity[];
+  const data = (res as any)?.data;
+  if (Array.isArray(data)) return data as FoundationEntity[];
+  return [];
+}
+
 export const foundationsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDepartments: builder.query<FoundationEntity[], void>({
       query: () => ({ url: "/foundations/departments", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["FOUNDATIONS"],
     }),
     createDepartment: builder.mutation<FoundationEntity, { name: string; code: string }>({
@@ -22,6 +30,7 @@ export const foundationsApi = baseApi.injectEndpoints({
     }),
     getBatches: builder.query<FoundationEntity[], void>({
       query: () => ({ url: "/foundations/batches", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["FOUNDATIONS"],
     }),
     createBatch: builder.mutation<FoundationEntity, Record<string, unknown>>({
@@ -38,6 +47,7 @@ export const foundationsApi = baseApi.injectEndpoints({
     }),
     getSections: builder.query<FoundationEntity[], void>({
       query: () => ({ url: "/foundations/sections", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["FOUNDATIONS"],
     }),
     createSection: builder.mutation<FoundationEntity, Record<string, unknown>>({
@@ -54,6 +64,7 @@ export const foundationsApi = baseApi.injectEndpoints({
     }),
     getCourses: builder.query<FoundationEntity[], void>({
       query: () => ({ url: "/foundations/courses", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["FOUNDATIONS"],
     }),
     createCourse: builder.mutation<FoundationEntity, Record<string, unknown>>({

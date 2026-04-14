@@ -1,19 +1,5 @@
 import { baseApi } from "@/redux/baseApi";
-
-type LoginPayload = { email: string; password: string };
-type RegisterPayload = {
-  name: string;
-  email: string;
-  password: string;
-  role?: string;
-  employee_id?: string;
-  designation?: string;
-};
-
-type LoginResponse = {
-  accessToken: string;
-  user: { id: string; name: string; email: string; role: string };
-};
+import type { LoginPayload, LoginResponse, RegisterPayload } from "@/types/authApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

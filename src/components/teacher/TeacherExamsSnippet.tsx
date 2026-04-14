@@ -12,17 +12,22 @@ export function TeacherExamsSnippet() {
     .slice(0, 5);
 
   return (
-    <div className="card">
-      <h2>Upcoming exams (schedule)</h2>
-      <p className="teacher-page__lead">Reference schedule for upcoming exams. Your assigned duties appear under My allocation.</p>
+    <div className="foundations">
+      <div className="card foundations__card">
+        <div className="foundations__page-head">
+          <div>
+            <h2>Upcoming exams</h2>
+            <p className="foundations__lead">Reference schedule for upcoming exams. Your assigned duties appear under My allocation.</p>
+          </div>
+        </div>
       {skipApi ? (
-        <p className="teacher-muted">Sign in to load the exam schedule.</p>
+        <p className="foundations__muted">Sign in to load the exam schedule.</p>
       ) : isLoading ? (
-        <p className="teacher-muted">Loading…</p>
+        <p className="foundations__muted">Loading…</p>
       ) : error ? (
-        <p className="teacher-error">Could not load exams.</p>
+        <p className="foundations__error">Could not load exams.</p>
       ) : upcoming.length === 0 ? (
-        <div className="teacher-empty">No exams in the list.</div>
+        <div className="foundations__empty">No exams in the list.</div>
       ) : (
         <ul style={{ margin: 0, paddingLeft: 18, color: "#4b5563" }}>
           {upcoming.map((e: Record<string, unknown>) => (
@@ -33,7 +38,7 @@ export function TeacherExamsSnippet() {
                   {" "}
                   — {String(e.exam_date)}
                   {e.start_time != null && e.end_time != null ? (
-                    <span className="teacher-muted">
+                    <span className="foundations__muted" style={{ margin: 0 }}>
                       {" "}
                       ({String(e.start_time)}–{String(e.end_time)})
                     </span>
@@ -44,6 +49,7 @@ export function TeacherExamsSnippet() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   );
 }

@@ -55,6 +55,14 @@ axiosInstance.interceptors.response.use(
       } catch (e) {
         processQueue(e);
         setAccessToken(null);
+        // Inform the app to clear Redux auth state as well.
+        try {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("auth:logout"));
+          }
+        } catch {
+          // ignore
+        }
         return Promise.reject(e);
       } finally {
         isRefreshing = false;

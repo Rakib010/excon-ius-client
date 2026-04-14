@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import {
-  type FoundationEntity,
   useCreateCourseMutation,
   useDeleteCourseMutation,
   useGetCoursesQuery,
   useGetDepartmentsQuery,
   useUpdateCourseMutation,
 } from "@/redux/features/foundations/foundations.api";
-import { mapCourses, mapDepartments, type Course } from "@/components/foundations/foundations.types";
+import { mapCourses, mapDepartments } from "@/components/foundations/foundations.types";
+import type { Course } from "@/types/foundations";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
 import { toast } from "react-toastify";
 
@@ -18,11 +18,11 @@ export function CoursesPanel() {
   const { data: rowsRaw = [], isLoading, error } = useGetCoursesQuery();
 
   const deptOptions = useMemo(() => {
-    const deps = mapDepartments(departmentsRaw as FoundationEntity[]);
+    const deps = mapDepartments(departmentsRaw);
     return deps.map((d) => ({ id: d.id, label: `${d.name} (${d.code})` }));
   }, [departmentsRaw]);
 
-  const rows = mapCourses(rowsRaw as FoundationEntity[]);
+  const rows = mapCourses(rowsRaw);
 
   const [createCourse, { isLoading: creating }] = useCreateCourseMutation();
   const [updateCourse, { isLoading: updating }] = useUpdateCourseMutation();
@@ -30,18 +30,18 @@ export function CoursesPanel() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
-  const [deptId, setDeptId] = useState<number>(0);
+  const [deptId, setDeptId] = useState<string>("");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (deptOptions.length > 0 && !deptId) setDeptId(deptOptions[0]!.id);
+    if (deptOptions.length > 0 && !deptId) setDeptId(String(deptOptions[0]!.id));
   }, [deptId, deptOptions]);
 
   const openCreate = () => {
     setEditing(null);
-    setDeptId(deptOptions[0]?.id ?? 0);
+    setDeptId(String(deptOptions[0]?.id ?? ""));
     setName("");
     setCode("");
     setFormError(null);
@@ -50,7 +50,7 @@ export function CoursesPanel() {
 
   const openEdit = (c: Course) => {
     setEditing(c);
-    setDeptId(c.dept_id);
+    setDeptId(String(c.dept_id));
     setName(c.name);
     setCode(c.code);
     setFormError(null);
@@ -64,7 +64,7 @@ export function CoursesPanel() {
       return;
     }
     try {
-      const payload = { dept_id: deptId, name: name.trim(), code: code.trim() };
+      const payload = { dept_id: Number(deptId), name: name.trim(), code: code.trim() };
       if (editing) await updateCourse({ id: editing.id, data: payload }).unwrap();
       else await createCourse(payload).unwrap();
       setOpen(false);
@@ -174,7 +174,7 @@ export function CoursesPanel() {
         <div className="foundations__form">
           <label className="foundations__field">
             <span>Department</span>
-            <select value={deptId} onChange={(e) => setDeptId(Number(e.target.value))}>
+            <select value={deptId} onChange={(e) => setDeptId(e.target.value)}>
               {deptOptions.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.label}

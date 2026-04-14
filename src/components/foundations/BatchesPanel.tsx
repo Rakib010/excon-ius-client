@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import {
-  type FoundationEntity,
   useCreateBatchMutation,
   useDeleteBatchMutation,
   useGetBatchesQuery,
   useGetDepartmentsQuery,
   useUpdateBatchMutation,
 } from "@/redux/features/foundations/foundations.api";
-import { mapBatches, mapDepartments, type Batch } from "@/components/foundations/foundations.types";
+import { mapBatches, mapDepartments } from "@/components/foundations/foundations.types";
+import type { Batch } from "@/types/foundations";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
 import { toast } from "react-toastify";
 
@@ -18,11 +18,11 @@ export function BatchesPanel() {
   const { data: rowsRaw = [], isLoading, error } = useGetBatchesQuery();
 
   const deptOptions = useMemo(() => {
-    const deps = mapDepartments(departmentsRaw as FoundationEntity[]);
+    const deps = mapDepartments(departmentsRaw);
     return deps.map((d) => ({ id: d.id, label: `${d.name} (${d.code})` }));
   }, [departmentsRaw]);
 
-  const rows = mapBatches(rowsRaw as FoundationEntity[]);
+  const rows = mapBatches(rowsRaw);
 
   const [createBatch, { isLoading: creating }] = useCreateBatchMutation();
   const [updateBatch, { isLoading: updating }] = useUpdateBatchMutation();
@@ -30,38 +30,39 @@ export function BatchesPanel() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Batch | null>(null);
-  const [deptId, setDeptId] = useState<number>(0);
-  const [name, setName] = useState("");
+  const [deptId, setDeptId] = useState<string>("");
+  const [batchNumber, setBatchNumber] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (deptOptions.length > 0 && !deptId) setDeptId(deptOptions[0]!.id);
+    if (deptOptions.length > 0 && !deptId) setDeptId(String(deptOptions[0]!.id));
   }, [deptId, deptOptions]);
 
   const openCreate = () => {
     setEditing(null);
-    setDeptId(deptOptions[0]?.id ?? 0);
-    setName("");
+    setDeptId(String(deptOptions[0]?.id ?? ""));
+    setBatchNumber("");
     setFormError(null);
     setOpen(true);
   };
 
   const openEdit = (b: Batch) => {
     setEditing(b);
-    setDeptId(b.dept_id);
-    setName(b.name);
+    setDeptId(String(b.dept_id));
+    setBatchNumber(String(b.number ?? b.name ?? ""));
     setFormError(null);
     setOpen(true);
   };
 
   const submit = async () => {
     setFormError(null);
-    if (!deptId || !name.trim()) {
-      setFormError("Department and batch name are required.");
+    const n = Number(batchNumber);
+    if (!deptId || !Number.isFinite(n) || n <= 0) {
+      setFormError("Department and batch number are required.");
       return;
     }
     try {
-      const payload = { dept_id: deptId, name: name.trim() };
+      const payload = { dept_id: deptId, number: n };
       if (editing) await updateBatch({ id: editing.id, data: payload }).unwrap();
       else await createBatch(payload).unwrap();
       setOpen(false);
@@ -169,7 +170,7 @@ export function BatchesPanel() {
         <div className="foundations__form">
           <label className="foundations__field">
             <span>Department</span>
-            <select value={deptId} onChange={(e) => setDeptId(Number(e.target.value))}>
+            <select value={deptId} onChange={(e) => setDeptId(e.target.value)}>
               {deptOptions.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.label}
@@ -179,7 +180,14 @@ export function BatchesPanel() {
           </label>
           <label className="foundations__field">
             <span>Batch name</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. 10" />
+            <input
+              type="number"
+              value={batchNumber}
+              onChange={(e) => setBatchNumber(e.target.value)}
+              placeholder="e.g. 10"
+              min={1}
+              step={1}
+            />
           </label>
           {formError ? <div className="foundations__error">{formError}</div> : null}
         </div>

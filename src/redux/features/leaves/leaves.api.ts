@@ -2,6 +2,13 @@ import { baseApi } from "@/redux/baseApi";
 
 export type LeaveEntity = Record<string, unknown> & { id?: number | string };
 
+function normalizeListResponse(res: unknown): LeaveEntity[] {
+  if (Array.isArray(res)) return res as LeaveEntity[];
+  const data = (res as any)?.data;
+  if (Array.isArray(data)) return data as LeaveEntity[];
+  return [];
+}
+
 export const leavesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     updateMyAvailability: builder.mutation<{ message: string }, { is_available: boolean }>({
@@ -38,10 +45,12 @@ export const leavesApi = baseApi.injectEndpoints({
     }),
     getLeaveRequests: builder.query<LeaveEntity[], void>({
       query: () => ({ url: "/leaves/requests", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["LEAVES"],
     }),
     getLeaveHistory: builder.query<LeaveEntity[], void>({
       query: () => ({ url: "/leaves/history", method: "GET" }),
+      transformResponse: normalizeListResponse,
       providesTags: ["LEAVES"],
     }),
   }),

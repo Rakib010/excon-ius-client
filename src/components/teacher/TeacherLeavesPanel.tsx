@@ -1,5 +1,9 @@
 import { useState } from "react";
 import "@/styles/teacher.css";
+import { Modal } from "@/components/ui/Modal";
+import { Tabs } from "@/components/ui/Tabs";
+import { PageCard } from "@/components/ui/PageCard";
+import { EmptyRow, Table } from "@/components/ui/Table";
 import {
   useApplyLeaveMutation,
   useCancelLeaveMutation,
@@ -7,13 +11,14 @@ import {
 } from "@/redux/features/leaves/leaves.api";
 import type { TeacherLeaveRow } from "@/types/teacher";
 import { useSkipTeacherApi } from "@/hooks/useTeacherProfile";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
-function statusClass(s: string) {
-  const u = s?.toUpperCase();
-  if (u === "PENDING") return "teacher-status teacher-status--pending";
-  if (u === "APPROVED") return "teacher-status teacher-status--approved";
-  if (u === "REJECTED") return "teacher-status teacher-status--rejected";
-  return "teacher-status";
+function fmtDate(v: unknown): string {
+  const s = String(v || "");
+  if (!s) return "—";
+  if (s.length >= 10) return s.slice(0, 10);
+  return s;
 }
 
 export function TeacherLeavesPanel() {
@@ -22,14 +27,14 @@ export function TeacherLeavesPanel() {
   const [apply, { isLoading: applying }] = useApplyLeaveMutation();
   const [cancel, { isLoading: cancelling }] = useCancelLeaveMutation();
 
-  const [showAddPanel, setShowAddPanel] = useState(false);
+  const [tab, setTab] = useState<"list" | "apply">("list");
+  const [open, setOpen] = useState(false);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [reason, setReason] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async () => {
     if (skipApi) return;
     setFormError(null);
     if (!start || !end) {
@@ -41,145 +46,156 @@ export function TeacherLeavesPanel() {
       setStart("");
       setEnd("");
       setReason("");
-      setShowAddPanel(false);
+      setOpen(false);
+      setTab("list");
+      toast.success("Leave request submitted.");
       await refetch();
-    } catch {
-      setFormError("Could not submit leave request.");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Could not submit leave request.");
+      setFormError(msg);
+      toast.error(msg);
     }
   };
 
   const onCancel = async (id: string) => {
     try {
       await cancel(id).unwrap();
+      toast.success("Leave request cancelled.");
       await refetch();
-    } catch {
-      setFormError("Could not cancel (only PENDING can be cancelled).");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, "Could not cancel (only PENDING can be cancelled).");
+      setFormError(msg);
+      toast.error(msg);
     }
   };
 
   const list = rows as TeacherLeaveRow[];
 
   return (
-    <div className="teacher-page">
-      <div className="teacher-leaves-split">
-        <div className="teacher-leaves-split__list card">
-          <h2 style={{ marginTop: 0 }}>My leave requests</h2>
-          <p className="teacher-page__lead">View and manage your leave requests.</p>
+    <PageCard title="My leave requests" lead="View, apply, and cancel (pending) leave requests.">
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: "list", label: "Requests" },
+          { id: "apply", label: "Apply leave" },
+        ]}
+      />
 
-          {skipApi ? (
-            <p className="teacher-muted">Sign in to load your leave history.</p>
-          ) : isLoading ? (
-            <p className="teacher-muted">Loading…</p>
-          ) : error ? (
-            <p className="teacher-error">Could not load leave history.</p>
-          ) : list.length === 0 ? (
-            <div className="teacher-empty">No leave requests yet.</div>
-          ) : (
-            <div className="teacher-table-wrap">
-              <table className="teacher-table">
+        <div className="foundations__toolbar">
+          <div className="foundations__toolbar-left">
+            {skipApi ? <span className="foundations__muted" style={{ margin: 0 }}>Sign in to manage leave.</span> : null}
+          </div>
+          <div className="foundations__toolbar-right">
+            <button
+              className="foundations__btn"
+              type="button"
+              disabled={skipApi}
+              onClick={() => {
+                setFormError(null);
+                setOpen(true);
+                setTab("apply");
+              }}
+            >
+              + Apply leave
+            </button>
+          </div>
+        </div>
+
+        {tab === "list" ? (
+          <>
+            {skipApi ? <p className="foundations__muted">Sign in to load your leave history.</p> : null}
+            {!skipApi && isLoading ? <p className="foundations__muted">Loading…</p> : null}
+            {!skipApi && error ? <p className="foundations__error">Could not load leave history.</p> : null}
+
+            <Table
+              head={
                 <thead>
                   <tr>
                     <th>Dates</th>
                     <th>Reason</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th style={{ width: 160 }}>Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {list.map((row) => (
-                    <tr key={row.id}>
-                      <td>
-                        {row.start_date} → {row.end_date}
-                      </td>
-                      <td>{row.reason ?? "—"}</td>
-                      <td>
-                        <span className={statusClass(row.status)}>{row.status}</span>
-                      </td>
-                      <td>
-                        {String(row.status).toUpperCase() === "PENDING" ? (
-                          <button
-                            type="button"
-                            className="teacher-btn-danger"
-                            disabled={cancelling}
-                            onClick={() => {
-                              if (window.confirm("Cancel this leave request?")) void onCancel(row.id);
-                            }}
-                          >
-                            Cancel
-                          </button>
-                        ) : (
-                          <span className="teacher-muted">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        <aside className="teacher-leaves-split__aside" aria-label="Add leave">
-          <div className="teacher-leaves-split__actions">
-            <button
-              type="button"
-              className="teacher-btn-add"
-              disabled={skipApi}
-              onClick={() => {
-                setFormError(null);
-                setShowAddPanel((v) => !v);
-              }}
+              }
             >
-              {showAddPanel ? "Close" : "Add leave"}
-            </button>
+              <tbody>
+                {!skipApi && !isLoading && !error && list.length === 0 ? <EmptyRow colSpan={4}>No leave requests yet.</EmptyRow> : null}
+                {list.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      {fmtDate(row.start_date)} → {fmtDate(row.end_date)}
+                    </td>
+                    <td>{row.reason ?? "—"}</td>
+                    <td>
+                      <span className="foundations__badge">{String(row.status || "—")}</span>
+                    </td>
+                    <td>
+                      {String(row.status).toUpperCase() === "PENDING" ? (
+                        <button
+                          type="button"
+                          className="foundations__danger"
+                          disabled={cancelling}
+                          onClick={() => {
+                            if (window.confirm("Cancel this leave request?")) void onCancel(row.id);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      ) : (
+                        <span className="foundations__muted" style={{ margin: 0 }}>
+                          —
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </>
+        ) : (
+          <div className="foundations__muted" style={{ margin: 0 }}>
+            Click “+ Apply leave” to open the form.
           </div>
+        )}
 
-          {showAddPanel && !skipApi && (
-            <div className="teacher-leaves-form-panel">
-              <h3>New leave request</h3>
-              <p className="teacher-muted" style={{ marginBottom: 12 }}>
-                Pick the leave dates and add an optional reason.
-              </p>
-              <form className="teacher-form" style={{ maxWidth: "100%" }} onSubmit={onSubmit}>
-                <div className="teacher-form__row">
-                  <label htmlFor="lv-start">Start date</label>
-                  <input id="lv-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} required />
-                </div>
-                <div className="teacher-form__row">
-                  <label htmlFor="lv-end">End date</label>
-                  <input id="lv-end" type="date" value={end} onChange={(e) => setEnd(e.target.value)} required />
-                </div>
-                <div className="teacher-form__row">
-                  <label htmlFor="lv-reason">Reason</label>
-                  <textarea id="lv-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Optional" />
-                </div>
-                {formError && <p className="teacher-error">{formError}</p>}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button className="btn" type="submit" disabled={applying}>
-                    {applying ? "Submitting…" : "Submit request"}
-                  </button>
-                  <button
-                    type="button"
-                    className="teacher-btn-add teacher-btn-add--ghost"
-                    onClick={() => {
-                      setShowAddPanel(false);
-                      setFormError(null);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+        <Modal
+          open={open}
+          title="Apply leave"
+          onClose={() => setOpen(false)}
+          footer={
+            <div className="foundations__modal-actions">
+              <button className="foundations__btn foundations__btn--ghost" type="button" onClick={() => setOpen(false)}>
+                Cancel
+              </button>
+              <button className="foundations__btn" type="button" disabled={applying || skipApi} onClick={() => void submit()}>
+                {applying ? "Submitting…" : "Submit request"}
+              </button>
             </div>
-          )}
-
-          {skipApi && (
-            <p className="teacher-muted" style={{ textAlign: "right" }}>
-              Sign in to add leave.
-            </p>
-          )}
-        </aside>
-      </div>
-    </div>
+          }
+        >
+          <div className="foundations__form">
+            <label className="foundations__field">
+              <span>Start date</span>
+              <input type="date" value={start} onChange={(e) => setStart(e.target.value)} required />
+            </label>
+            <label className="foundations__field">
+              <span>End date</span>
+              <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} required />
+            </label>
+            <label className="foundations__field">
+              <span>Reason (optional)</span>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Optional"
+                style={{ minHeight: 90, resize: "vertical", borderRadius: 10, padding: "9px 10px", border: "1px solid #d1d5db", font: "inherit" }}
+              />
+            </label>
+            {formError ? <div className="foundations__error">{formError}</div> : null}
+          </div>
+        </Modal>
+    </PageCard>
   );
 }

@@ -20,22 +20,26 @@ export function TeacherDutiesPanel({ teacherId }: { teacherId: string | null }) 
   );
 
   return (
-    <div className="card">
-      <h2>My published invigilation duties</h2>
-      <p className="teacher-page__lead">Published duties assigned to you.</p>
+    <div className="foundations">
+      <div className="card foundations__card">
+        <div className="foundations__page-head">
+          <div>
+            <h2>My allocation</h2>
+            <p className="foundations__lead">Published invigilation duties assigned to you.</p>
+          </div>
+        </div>
 
       {!teacherId ? (
-        <p className="teacher-muted">{skipApi ? "Sign in to see your duties." : "Loading your profile…"}
-        </p>
+        <p className="foundations__muted">{skipApi ? "Sign in to see your duties." : "Loading your profile…"}</p>
       ) : isLoading ? (
-        <p className="teacher-muted">Loading…</p>
+        <p className="foundations__muted">Loading…</p>
       ) : error ? (
-        <p className="teacher-error">Could not load allocations.</p>
+        <p className="foundations__error">Could not load allocations.</p>
       ) : rows.length === 0 ? (
-        <div className="teacher-empty">No published duties assigned to you yet.</div>
+        <div className="foundations__empty">No published duties assigned to you yet.</div>
       ) : (
-        <div className="teacher-table-wrap">
-          <table className="teacher-table">
+        <div className="foundations__table-wrap">
+          <table className="foundations__table">
             <thead>
               <tr>
                 <th>Course</th>
@@ -53,7 +57,7 @@ export function TeacherDutiesPanel({ teacherId }: { teacherId: string | null }) 
                   <td>{fmtDate(row.exam_date)}</td>
                   <td>{row.room_name}</td>
                   <td>
-                    <span className="teacher-status teacher-status--approved">{row.status}</span>
+                    <span className="foundations__badge">{row.status}</span>
                   </td>
                 </tr>
               ))}
@@ -61,6 +65,7 @@ export function TeacherDutiesPanel({ teacherId }: { teacherId: string | null }) 
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 }

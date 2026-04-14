@@ -16,25 +16,34 @@ export function TeacherAvailabilityPanel() {
 
   if (skipApi) {
     return (
-      <div className="card">
-        <h2>Availability for invigilation</h2>
-        <p className="teacher-muted">
-          Sign in to view and update your availability.
-        </p>
+      <div className="foundations">
+        <div className="card foundations__card">
+          <div className="foundations__page-head">
+            <div>
+              <h2>Availability</h2>
+              <p className="foundations__muted">Sign in to view and update your availability.</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h2>Availability for invigilation</h2>
-      <p className="teacher-page__lead">Set whether you are available for invigilation scheduling.</p>
+    <div className="foundations">
+      <div className="card foundations__card">
+        <div className="foundations__page-head">
+          <div>
+            <h2>Availability</h2>
+            <p className="foundations__lead">Set whether you are available for invigilation scheduling.</p>
+          </div>
+        </div>
 
       {isLoading ? (
-        <p className="teacher-muted">Loading…</p>
+        <p className="foundations__muted">Loading…</p>
       ) : (
         <>
-          <p className="teacher-muted" style={{ marginBottom: 12 }}>
+          <p className="foundations__muted" style={{ marginBottom: 12 }}>
             Current status:{" "}
             <strong>{available ? "Available" : profile?.is_available === false ? "Not available" : "Unknown"}</strong>
           </p>
@@ -59,12 +68,13 @@ export function TeacherAvailabilityPanel() {
           </div>
 
           {error != null && (
-            <p className="teacher-error" style={{ marginTop: 12 }}>
+            <p className="foundations__error" style={{ marginTop: 12 }}>
               Could not update availability. Please try again.
             </p>
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

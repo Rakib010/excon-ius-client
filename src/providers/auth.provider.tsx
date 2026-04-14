@@ -26,6 +26,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     dispatch(authActions.setUser(data as any));
   }, [data, dispatch]);
 
+  useEffect(() => {
+    const handler = () => dispatch(authActions.clearAuth());
+    try {
+      window.addEventListener("auth:logout", handler as any);
+    } catch {
+      // ignore (non-browser)
+    }
+    return () => {
+      try {
+        window.removeEventListener("auth:logout", handler as any);
+      } catch {
+        // ignore
+      }
+    };
+  }, [dispatch]);
+
   const [loginMutation] = useLoginMutation();
   const [logoutMutation] = useLogoutMutation();
 

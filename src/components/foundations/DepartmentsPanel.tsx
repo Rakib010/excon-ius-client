@@ -2,19 +2,19 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import {
-  type FoundationEntity,
   useCreateDepartmentMutation,
   useDeleteDepartmentMutation,
   useGetDepartmentsQuery,
   useUpdateDepartmentMutation,
 } from "@/redux/features/foundations/foundations.api";
-import { mapDepartments, type Department } from "@/components/foundations/foundations.types";
+import { mapDepartments } from "@/components/foundations/foundations.types";
+import type { Department } from "@/types/foundations";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
 import { toast } from "react-toastify";
 
 export function DepartmentsPanel() {
   const { data: rowsRaw = [], isLoading, error } = useGetDepartmentsQuery();
-  const rows = mapDepartments(rowsRaw as FoundationEntity[]);
+  const rows = mapDepartments(rowsRaw);
 
   const [createDepartment, { isLoading: creating }] = useCreateDepartmentMutation();
   const [updateDepartment, { isLoading: updating }] = useUpdateDepartmentMutation();

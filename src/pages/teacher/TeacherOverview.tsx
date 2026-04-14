@@ -27,15 +27,21 @@ export function TeacherOverview() {
   const leaves = leaveHistory as TeacherLeaveRow[];
 
   return (
-    <div className="teacher-page">
-      <div className="card">
-        <h1>Teacher overview</h1>
-        <p className="teacher-page__lead">Quick snapshot of your profile, leave requests, duties, and upcoming exams.</p>
+    <div className="teacher-adminlike">
+      <div className="foundations">
+        <div className="card foundations__card">
+          <div className="foundations__page-head">
+            <div>
+              <h1>Teacher overview</h1>
+              <p className="foundations__lead">Quick snapshot of your profile, leave requests, duties, and upcoming exams.</p>
+            </div>
+          </div>
         {(Boolean(allocationsError) || Boolean(leavesError)) && (
-          <p className="teacher-error" style={{ marginTop: 12 }}>
+          <p className="foundations__error" style={{ marginTop: 12 }}>
             Some data could not be loaded. Please refresh and try again.
           </p>
         )}
+        </div>
       </div>
 
       <TeacherOverviewStats

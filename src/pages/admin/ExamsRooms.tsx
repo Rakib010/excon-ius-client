@@ -1,14 +1,24 @@
+import { useState } from "react";
+import { RoomsPanel } from "@/components/exam-room/RoomsPanel";
+import { ExamsPanel } from "@/components/exam-room/ExamsPanel";
+import { Tabs } from "@/components/ui/Tabs";
+import { PageCard } from "@/components/ui/PageCard";
+
 export function ExamsRooms() {
+  const [tab, setTab] = useState<"rooms" | "exams">("rooms");
   return (
-    <div className="card">
-      <h1>Exams & Rooms</h1>
-      <p>Create exams and rooms, assign rooms to exams, and view capacity.</p>
-      <ul>
-        <li>Exams: `/exam-room/exams`</li>
-        <li>Rooms: `/exam-room/rooms`</li>
-        <li>Assign room: POST `/exam-room/rooms/assign`</li>
-      </ul>
-    </div>
+    <PageCard title="Exams & Rooms" lead="Manage rooms and exams for allocations.">
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: "rooms", label: "Rooms" },
+          { id: "exams", label: "Exams" },
+        ]}
+      />
+      {tab === "rooms" ? <RoomsPanel /> : null}
+      {tab === "exams" ? <ExamsPanel /> : null}
+    </PageCard>
   );
 }
 

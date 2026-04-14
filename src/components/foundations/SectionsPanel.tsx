@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import {
-  type FoundationEntity,
   useCreateSectionMutation,
   useDeleteSectionMutation,
   useGetBatchesQuery,
   useGetSectionsQuery,
   useUpdateSectionMutation,
 } from "@/redux/features/foundations/foundations.api";
-import { mapBatches, mapSections, type Section } from "@/components/foundations/foundations.types";
+import { mapBatches, mapSections } from "@/components/foundations/foundations.types";
+import type { Section } from "@/types/foundations";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
 import { toast } from "react-toastify";
 
@@ -18,11 +18,11 @@ export function SectionsPanel() {
   const { data: rowsRaw = [], isLoading, error } = useGetSectionsQuery();
 
   const batchOptions = useMemo(() => {
-    const batches = mapBatches(batchesRaw as FoundationEntity[]);
-    return batches.map((b) => ({ id: b.id, label: `${b.dept_name ?? "Dept"} · ${b.name}` }));
+    const batches = mapBatches(batchesRaw);
+    return batches.map((b) => ({ id: b.id, label: `${b.dept_name ?? "Dept"} · ${b.name ?? b.number ?? "—"}` }));
   }, [batchesRaw]);
 
-  const rows = mapSections(rowsRaw as FoundationEntity[]);
+  const rows = mapSections(rowsRaw);
 
   const [createSection, { isLoading: creating }] = useCreateSectionMutation();
   const [updateSection, { isLoading: updating }] = useUpdateSectionMutation();
@@ -30,17 +30,17 @@ export function SectionsPanel() {
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Section | null>(null);
-  const [batchId, setBatchId] = useState<number>(0);
+  const [batchId, setBatchId] = useState<string>("");
   const [name, setName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (batchOptions.length > 0 && !batchId) setBatchId(batchOptions[0]!.id);
+    if (batchOptions.length > 0 && !batchId) setBatchId(String(batchOptions[0]!.id));
   }, [batchId, batchOptions]);
 
   const openCreate = () => {
     setEditing(null);
-    setBatchId(batchOptions[0]?.id ?? 0);
+    setBatchId(String(batchOptions[0]?.id ?? ""));
     setName("");
     setFormError(null);
     setOpen(true);
@@ -48,7 +48,7 @@ export function SectionsPanel() {
 
   const openEdit = (s: Section) => {
     setEditing(s);
-    setBatchId(s.batch_id);
+    setBatchId(String(s.batch_id));
     setName(s.name);
     setFormError(null);
     setOpen(true);
@@ -61,7 +61,7 @@ export function SectionsPanel() {
       return;
     }
     try {
-      const payload = { batch_id: batchId, name: name.trim() };
+      const payload = { batch_id: Number(batchId), name: name.trim() };
       if (editing) await updateSection({ id: editing.id, data: payload }).unwrap();
       else await createSection(payload).unwrap();
       setOpen(false);
@@ -171,7 +171,7 @@ export function SectionsPanel() {
         <div className="foundations__form">
           <label className="foundations__field">
             <span>Batch</span>
-            <select value={batchId} onChange={(e) => setBatchId(Number(e.target.value))}>
+            <select value={batchId} onChange={(e) => setBatchId(e.target.value)}>
               {batchOptions.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.label}

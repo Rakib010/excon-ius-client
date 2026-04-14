@@ -6,6 +6,17 @@
   gap: 16px;
 }
 
+.teacher-adminlike {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teacher-adminlike .foundations__card h1,
+.teacher-adminlike .foundations__card h2 {
+  margin: 0;
+}
+
 .teacher-page__lead {
   margin: 0 0 4px;
   font-size: 0.95rem;
@@ -19,7 +30,7 @@
 }
 
 .teacher-stat {
-  background: #f9fafb;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 14px 16px;
@@ -169,7 +180,7 @@
 .teacher-table-wrap {
   overflow-x: auto;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
 }
 
@@ -232,7 +243,7 @@
   background: #fff;
   color: #b91c1c;
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
